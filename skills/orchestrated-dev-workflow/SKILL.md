@@ -15,7 +15,7 @@ The main agent must not:
 - brainstorm solutions
 - design architecture
 - write code
-- edit files
+- edit files, except to create or update the user-facing Markdown plan file for the Plan Approval Gate
 - run tests
 - review the implementation
 - review or approve requirements itself
@@ -30,6 +30,8 @@ The main agent may only:
 - forward subagent questions to the user
 - pass user answers back to the relevant subagent
 - stop the workflow when a stage requires user input
+- create or update the final Markdown plan file using only the architect-provided plan
+- open the final Markdown plan file in VS Code for user review
 - summarize the workflow status using only subagent-provided conclusions
 - report the final subagent verdict
 
@@ -45,16 +47,19 @@ This workflow expects the following Codex subagents to exist:
 4. `coder`
 5. `tester`
 
+The main agent must also have access to a plan-file location inside the active workspace. If the user does not provide one, use a Markdown file under `docs/plans/` with a descriptive timestamped filename.
+
 ## Required Stage Order
 
 Always run the stages in this order:
 
 ```text
-requirements_gatherer -> requirements_reviewer -> architect -> coder -> tester
+requirements_gatherer -> requirements_reviewer -> architect -> user_plan_approval -> coder -> tester
 ```
 
 Do not skip `requirements_reviewer`.
 Do not spawn `architect` until `requirements_reviewer` returns `REQUIREMENTS_APPROVED_FOR_ARCHITECTURE`.
+Do not spawn `coder` until the user explicitly approves the final implementation plan file.
 
 ## Core Principle
 
@@ -74,13 +79,16 @@ requirements_reviewer
   Must confirm there are no assumptions, gaps, contradictions, or request mismatches before architecture.
 
 architect
-  Owns: how reviewer-approved finalized requirements should be implemented in the existing codebase.
+  Owns: how reviewer-approved finalized requirements should be implemented in the existing codebase, including the final Markdown implementation plan.
+
+user_plan_approval
+  Owns: explicit user approval of the final implementation plan file before implementation begins.
 
 coder
-  Owns: implementing the architect's plan with a focused code change.
+  Owns: implementing only the user-approved architect's plan with a focused code change.
 
 tester
-  Owns: verifying the implementation against reviewer-approved finalized requirements and the architecture plan.
+  Owns: verifying the implementation against reviewer-approved finalized requirements and the user-approved architecture plan.
 ```
 
 ## Requirements Gate
@@ -121,10 +129,41 @@ If `requirements_reviewer` returns `REQUIREMENTS_APPROVED_FOR_ARCHITECTURE`:
 - Pass the finalized requirements brief and reviewer report to `architect`.
 - Continue the staged workflow.
 
+## Plan Approval Gate
+
+Implementation must not begin until the user has approved the final implementation plan.
+
+After `architect` completes and before spawning `coder`:
+
+1. Require the architect to provide a final implementation plan in Markdown.
+2. Write that final plan to a Markdown plan file inside the active workspace.
+3. Open the plan file in VS Code with `code <plan-file>`.
+4. Ask the user to review the plan file and explicitly approve continuing.
+5. Stop the workflow until the user approves the plan.
+
+The plan file must include:
+- reviewer-approved requirements summary
+- relevant architecture decisions
+- files or modules expected to change
+- implementation steps
+- validation and test plan
+- known risks, exclusions, or assumptions
+
+If the user requests changes to the plan:
+- Send the requested changes back to `architect`.
+- Update the plan file with the revised final plan.
+- Reopen or refresh the plan file in VS Code.
+- Ask the user for approval again.
+- Do not spawn `coder` until the user approves the revised plan.
+
+If the user approves the plan:
+- Pass the approved plan file path, the final plan contents, the finalized requirements brief, and the reviewer report to `coder`.
+- Continue to implementation and testing.
+
 ## Handoff Rules
 
 - The raw user prompt is background context after requirements are finalized; it is not a substitute for approved requirements.
 - The architect must design only from reviewer-approved finalized requirements.
-- The coder must implement only from the architect's plan.
-- The tester must verify only against reviewer-approved finalized requirements and the architecture plan.
+- The coder must implement only from the user-approved architect's plan.
+- The tester must verify only against reviewer-approved finalized requirements and the user-approved architecture plan.
 - If any downstream agent finds a requirements gap, stop and route the issue back through `requirements_gatherer` and `requirements_reviewer`.
