@@ -1,0 +1,35 @@
+{
+  "name": "agent-files",
+  "version": "0.1.0",
+  "description": "Codex subagent profiles and workflow skills for staged software development.",
+  "author": {
+    "name": "Ryan Teh",
+    "email": "srwog+github@live.com",
+    "url": "https://github.com/rthm93"
+  },
+  "homepage": "https://github.com/rthm93/agent-files",
+  "repository": "https://github.com/rthm93/agent-files.git",
+  "keywords": [
+    "codex",
+    "subagents",
+    "workflow",
+    "skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Files",
+    "shortDescription": "Staged Codex subagent workflow files.",
+    "longDescription": "Provides Codex agent profiles, an orchestrated development workflow skill, and supporting conventions for staged requirements, architecture, coding, and testing work.",
+    "developerName": "Ryan Teh",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Skills",
+      "Workflow"
+    ],
+    "defaultPrompt": [
+      "Use the orchestrated dev workflow for this change.",
+      "Run staged requirements, architecture, coding, and testing.",
+      "Validate this repo's Codex plugin manifest."
+    ]
+  }
+}
