@@ -5,7 +5,7 @@
   },
   "plugins": [
     {
-      "name": "agent-files",
+      "name": "rthm93",
       "source": {
         "source": "url",
         "url": "https://github.com/rthm93/agent-files.git",
