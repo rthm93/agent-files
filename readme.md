@@ -1,21 +1,24 @@
 # Agent Files
 
 This repository is a local Codex plugin named `agent-files`. It packages a staged
-development workflow for Codex along with the agent profile files that workflow
-expects.
+development workflow for Codex along with bundled agent profile prompts used by
+that workflow.
 
 ## Contents
 
 - `.codex-plugin/plugin.json`: Codex plugin manifest.
 - `skills/orchestrated-dev-workflow/`: skill for running a requirements,
   requirements review, architecture, plan approval, coding, and testing workflow.
-- `agents/`: five Codex agent TOML profiles used by the workflow:
+- `agents/`: five bundled Codex agent TOML profile prompts used by the workflow:
   `requirements_gatherer`, `requirements_reviewer`, `architect`, `coder`, and
   `tester`.
 - `docs/language-conventions/`: supporting coding convention notes.
 
-The `orchestrated-dev-workflow` skill expects all five agent TOML profiles to be
-available in `agents/`.
+The `orchestrated-dev-workflow` skill expects all five TOML profile prompt files
+to be available in this plugin's `agents/` directory. These files are not
+automatically registered as custom Codex subagent types. The skill uses Codex's
+built-in subagent roles and instructs the orchestrator to inject the relevant
+TOML profile contents into each spawned subagent prompt.
 
 ## Local Install
 
@@ -37,7 +40,8 @@ available in `agents/`.
 6. Enable the installed plugin named `agent-files`.
 
 The plugin manifest lives at `.codex-plugin/plugin.json` and declares the
-bundled skills with `skills: "./skills/"`.
+bundled skills with `skills: "./skills/"`. It does not register the TOML files
+under `agents/` as subagent roles.
 
 ## Local Validation
 

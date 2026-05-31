@@ -26,6 +26,7 @@ The main agent must not:
 
 The main agent may only:
 - start the correct subagent at the correct stage
+- read bundled agent TOML profile files only to copy their contents into subagent spawn prompts
 - pass inputs from one stage to the next
 - forward subagent questions to the user
 - pass user answers back to the relevant subagent
@@ -35,17 +36,45 @@ The main agent may only:
 - summarize the workflow status using only subagent-provided conclusions
 - report the final subagent verdict
 
-The specialist agents own the actual work.
+The specialist profile prompts own the actual work.
 
-## Required Agents
+## Required Profile Files And Built-In Roles
 
-This workflow expects the following Codex subagents to exist:
+This workflow uses Codex built-in subagent roles and the bundled TOML files as
+profile prompts. The TOML files are not automatically registered as custom
+subagent types by the plugin manifest.
 
-1. `requirements_gatherer`
-2. `requirements_reviewer`
-3. `architect`
-4. `coder`
-5. `tester`
+Required bundled profile files, resolved relative to the plugin root:
+
+1. `agents/requirements_gatherer.toml`
+2. `agents/requirements_reviewer.toml`
+3. `agents/architect.toml`
+4. `agents/coder.toml`
+5. `agents/tester.toml`
+
+When this skill is loaded from `skills/orchestrated-dev-workflow/SKILL.md`,
+the bundled profile files are at `../../agents/*.toml` from this file's
+directory. Do not resolve `agents/*.toml` relative to the user's active
+workspace unless the user explicitly points this workflow at a different
+profile bundle.
+
+When spawning a stage with Codex's built-in subagent facility such as
+`multi_agent_v1`, use this mapping:
+
+| Workflow stage | Built-in subagent role | Profile file to inject |
+| --- | --- | --- |
+| `requirements_gatherer` | `default` | `agents/requirements_gatherer.toml` |
+| `requirements_reviewer` | `default` | `agents/requirements_reviewer.toml` |
+| `architect` | `default` | `agents/architect.toml` |
+| `coder` | `worker` | `agents/coder.toml` |
+| `tester` | `worker` | `agents/tester.toml` |
+
+Prefer `default` for requirements gathering, requirements review, and
+architecture. If `default` is unavailable, use `worker` for those stages.
+
+Use `explorer` only for a bounded codebase question requested by the owning
+stage. Its answer must be returned to the owning stage and must not bypass any
+gate or become a substitute for the required stage handoff.
 
 The main agent must also have access to a plan-file location inside the active workspace. If the user does not provide one, use a Markdown file under `docs/plans/` with a descriptive timestamped filename.
 
@@ -111,7 +140,7 @@ If `requirements_gatherer` returns `NOT_READY_FOR_REQUIREMENTS_REVIEW`:
 - Resume only from `requirements_gatherer`.
 
 If `requirements_gatherer` returns `READY_FOR_REQUIREMENTS_REVIEW`:
-- Spawn `requirements_reviewer`.
+- Spawn a built-in subagent with the `requirements_reviewer` profile.
 - Pass it the original user request, all gathered user answers, and the finalized requirements brief.
 
 If `requirements_reviewer` returns `REQUIREMENTS_NEED_USER_INPUT`:
@@ -126,7 +155,7 @@ If `requirements_reviewer` returns `REQUIREMENTS_NEED_GATHERER_REVISION`:
 - Rerun `requirements_reviewer` after the gatherer revises the brief.
 
 If `requirements_reviewer` returns `REQUIREMENTS_APPROVED_FOR_ARCHITECTURE`:
-- Pass the finalized requirements brief and reviewer report to `architect`.
+- Spawn a built-in subagent with the `architect` profile and pass it the finalized requirements brief and reviewer report.
 - Continue the staged workflow.
 
 ## Plan Approval Gate
@@ -157,11 +186,27 @@ If the user requests changes to the plan:
 - Do not spawn `coder` until the user approves the revised plan.
 
 If the user approves the plan:
-- Pass the approved plan file path, the final plan contents, the finalized requirements brief, and the reviewer report to `coder`.
+- Spawn a built-in subagent with the `coder` profile and pass the approved plan file path, the final plan contents, the finalized requirements brief, and the reviewer report to it.
 - Continue to implementation and testing.
+
+After `coder` completes:
+- Spawn a built-in subagent with the `tester` profile.
+- Pass it the coder's implementation report, the changed-file summary, the approved plan file path, the final plan contents, the finalized requirements brief, and the reviewer report.
+- Report the tester's final verdict to the user using only the tester-provided conclusions.
 
 ## Handoff Rules
 
+- Every stage spawn prompt must include the full contents of that stage's TOML
+  profile file. Do not rely on the profile name alone.
+- Every stage spawn prompt must clearly state the built-in role being used, the
+  workflow stage being performed, and that the injected TOML profile contents are
+  authoritative instructions for the stage.
+- Every stage spawn prompt must include the stage input: the original user
+  request when relevant, all accumulated user answers, the previous stage
+  handoff, and the exact gate verdicts or output fields the stage must return.
+- The orchestrator must pass the stage output forward verbatim except for
+  user-facing summaries and Markdown plan-file creation from the architect's
+  final plan.
 - The raw user prompt is background context after requirements are finalized; it is not a substitute for approved requirements.
 - The architect must design only from reviewer-approved finalized requirements.
 - The coder must implement only from the user-approved architect's plan.

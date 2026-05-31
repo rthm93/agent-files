@@ -1,0 +1,21 @@
+{
+  "name": "agent-files",
+  "interface": {
+    "displayName": "Agent Files"
+  },
+  "plugins": [
+    {
+      "name": "agent-files",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/rthm93/agent-files.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
