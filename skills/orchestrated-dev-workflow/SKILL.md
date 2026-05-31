@@ -15,7 +15,7 @@ The main agent must not:
 - brainstorm solutions
 - design architecture
 - write code
-- edit files, except to create or update the user-facing Markdown plan file for the Plan Approval Gate
+- edit files
 - run tests
 - review the implementation
 - review or approve requirements itself
@@ -31,8 +31,7 @@ The main agent may only:
 - forward subagent questions to the user
 - pass user answers back to the relevant subagent
 - stop the workflow when a stage requires user input
-- create or update the final Markdown plan file using only the architect-provided plan
-- open the final Markdown plan file in VS Code for user review
+- open the architect-written Markdown plan file in VS Code for user review
 - summarize the workflow status using only subagent-provided conclusions
 - report the final subagent verdict
 
@@ -111,7 +110,7 @@ architect
   Owns: how reviewer-approved finalized requirements should be implemented in the existing codebase, including the final Markdown implementation plan.
 
 user_plan_approval
-  Owns: explicit user approval of the final implementation plan file before implementation begins.
+  Owns: explicit user approval of the architect-written implementation plan file before implementation begins.
 
 coder
   Owns: implementing only the user-approved architect's plan with a focused code change.
@@ -164,8 +163,8 @@ Implementation must not begin until the user has approved the final implementati
 
 After `architect` completes and before spawning `coder`:
 
-1. Require the architect to provide a final implementation plan in Markdown.
-2. Write that final plan to a Markdown plan file inside the active workspace.
+1. Require the architect to create or update a final implementation plan in a Markdown plan file inside the active workspace.
+2. Require the architect to return the exact repo-relative plan file path.
 3. Open the plan file in VS Code with `code <plan-file>`.
 4. Ask the user to review the plan file and explicitly approve continuing.
 5. Stop the workflow until the user approves the plan.
@@ -180,12 +179,13 @@ The plan file must include:
 
 If the user requests changes to the plan:
 - Send the requested changes back to `architect`.
-- Update the plan file with the revised final plan.
+- Require `architect` to update the same plan file or return the new plan file path.
 - Reopen or refresh the plan file in VS Code.
 - Ask the user for approval again.
 - Do not spawn `coder` until the user approves the revised plan.
 
 If the user approves the plan:
+- Read the approved Markdown plan file.
 - Spawn a built-in subagent with the `coder` profile and pass the approved plan file path, the final plan contents, the finalized requirements brief, and the reviewer report to it.
 - Continue to implementation and testing.
 
@@ -205,8 +205,8 @@ After `coder` completes:
   request when relevant, all accumulated user answers, the previous stage
   handoff, and the exact gate verdicts or output fields the stage must return.
 - The orchestrator must pass the stage output forward verbatim except for
-  user-facing summaries and Markdown plan-file creation from the architect's
-  final plan.
+  user-facing summaries and reading the architect-written Markdown plan file for
+  approval and coder handoff.
 - The raw user prompt is background context after requirements are finalized; it is not a substitute for approved requirements.
 - The architect must design only from reviewer-approved finalized requirements.
 - The coder must implement only from the user-approved architect's plan.

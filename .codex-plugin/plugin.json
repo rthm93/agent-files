@@ -1,6 +1,6 @@
 {
   "name": "agent-files",
-  "version": "0.1.0+codex.20260531043707",
+  "version": "0.1.0+codex.20260531050607",
   "description": "Codex subagent profiles and workflow skills for staged software development.",
   "author": {
     "name": "Ryan Teh",
