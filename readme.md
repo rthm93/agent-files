@@ -8,13 +8,14 @@ that workflow.
 
 - `.codex-plugin/plugin.json`: Codex plugin manifest.
 - `skills/orchestrated-dev-workflow/`: skill for running a requirements,
-  requirements review, architecture, plan approval, coding, and testing workflow.
-- `agents/`: five bundled Codex agent TOML profile prompts used by the workflow:
-  `requirements_gatherer`, `requirements_reviewer`, `architect`, `coder`, and
-  `tester`.
+  requirements review, parallel architecture and TDD test planning, plan
+  approval, coding, and testing workflow.
+- `agents/`: six bundled Codex agent TOML profile prompts used by the workflow:
+  `requirements_gatherer`, `requirements_reviewer`, `architect`,
+  `tdd_test_planner`, `coder`, and `tester`.
 - `docs/language-conventions/`: supporting coding convention notes.
 
-The `orchestrated-dev-workflow` skill expects all five TOML profile prompt files
+The `orchestrated-dev-workflow` skill expects all six TOML profile prompt files
 to be available in this plugin's `agents/` directory. These files are not
 automatically registered as custom Codex subagent types. The skill uses Codex's
 built-in subagent roles and instructs the orchestrator to inject the relevant

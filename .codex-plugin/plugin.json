@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "Agent Files",
     "shortDescription": "Staged Codex subagent workflow files.",
-    "longDescription": "Provides Codex agent profiles, an orchestrated development workflow skill, and supporting conventions for staged requirements, architecture, coding, and testing work.",
+    "longDescription": "Provides Codex agent profiles, an orchestrated development workflow skill, and supporting conventions for staged requirements, architecture, TDD test planning, coding, and testing work.",
     "developerName": "Ryan Teh",
     "category": "Developer Tools",
     "capabilities": [
@@ -28,7 +28,7 @@
     ],
     "defaultPrompt": [
       "Use the orchestrated dev workflow for this change.",
-      "Run staged requirements, architecture, coding, and testing.",
+      "Run staged requirements, architecture, TDD test planning, coding, and testing.",
       "Validate this repo's Codex plugin manifest."
     ]
   }
