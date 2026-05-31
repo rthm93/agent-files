@@ -1,11 +1,11 @@
 {
-  "name": "agent-files",
+  "name": "rthm93",
   "interface": {
     "displayName": "Agent Files"
   },
   "plugins": [
     {
-      "name": "rthm93",
+      "name": "agent-files",
       "source": {
         "source": "url",
         "url": "https://github.com/rthm93/agent-files.git",

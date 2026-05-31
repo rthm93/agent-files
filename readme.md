@@ -1,6 +1,6 @@
 # Agent Files
 
-This repository is a local Codex plugin installed as `rthm93@agent-files`. It packages a staged
+This repository is a local Codex plugin installed as `agent-files@rthm93`. It packages a staged
 development workflow for Codex along with bundled agent profile prompts used by
 that workflow.
 
@@ -37,7 +37,7 @@ TOML profile contents into each spawned subagent prompt.
    /mnt/d/Git/agent-files
    ```
 
-6. Enable the installed plugin named `rthm93@agent-files`.
+6. Enable the installed plugin named `agent-files@rthm93`.
 
 The plugin manifest lives at `.codex-plugin/plugin.json` and declares the
 bundled skills with `skills: "./skills/"`. It does not register the TOML files
