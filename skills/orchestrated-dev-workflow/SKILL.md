@@ -1,11 +1,18 @@
 ---
 name: orchestrated-dev-workflow
-description: Run a staged Codex subagent workflow for software changes. The main agent acts only as an orchestrator and message router. It must not perform requirements analysis, architecture, coding, testing, or requirements review itself.
+description: Explicit invocation only. Use this staged Codex subagent workflow only when the user names `orchestrated-dev-workflow` or directly asks to use this exact skill.
 ---
 
 # Orchestrated Dev Workflow
 
-Use this skill when the user wants to implement a software change using a staged subagent workflow.
+## Activation Policy
+
+Use this skill only when the user explicitly invokes it by name, for example
+`orchestrated-dev-workflow`, or directly asks Codex to use this exact skill.
+
+Do not activate this skill just because a prompt asks for software changes,
+subagents, staged planning, requirements gathering, architecture, TDD, testing,
+or an approval-gated workflow.
 
 The main agent is **only an orchestrator**.
 
